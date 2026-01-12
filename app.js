@@ -68,36 +68,40 @@ function App() {
     }
   }, [view, scanMode]);
 
+  const workerRef = useRef(null);
+
+  const initWorker = async () => {
+    if (workerRef.current) return workerRef.current;
+
+    if (typeof Tesseract === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    const worker = await Tesseract.createWorker('jpn+eng');
+    workerRef.current = worker;
+    return worker;
+  };
+
   const handleManualOCR = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setLoading(true);
     setView('results');
-    setScannedResult({ productName: 'Analyzing Japanese ingredients...', status: 'PENDING', matches: [] });
+    setScannedResult({ productName: 'Waking up analysis engine...', status: 'PENDING', matches: [] });
 
     try {
-      // Compress image first for faster processing
-      setScannedResult({ productName: 'Compressing image for speed...', status: 'PENDING', matches: [] });
       const compressedBlob = await compressImage(file);
+      const worker = await initWorker();
 
-      // Load Tesseract via CDN if not present
-      if (typeof Tesseract === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = 'https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js';
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-
-      setScannedResult({ productName: 'Analyzing ingredients...', status: 'PENDING', matches: [] });
-
-      // Initialize worker for Japanese + English
-      const worker = await Tesseract.createWorker('jpn+eng');
+      setScannedResult({ productName: 'Reading Japanese text...', status: 'PENDING', matches: [] });
       const { data: { text } } = await worker.recognize(compressedBlob);
-      await worker.terminate();
 
       const status = detectHalalStatus(text);
       setScannedResult({
@@ -106,7 +110,7 @@ function App() {
       });
     } catch (err) {
       console.error(err);
-      setErrorMessage("Photo analysis failed. Ensure the text is clear.");
+      setErrorMessage("Analysis failed. Try taking a closer, clearer photo.");
       setView('home');
     }
     setLoading(false);

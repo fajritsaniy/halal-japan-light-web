@@ -14,13 +14,19 @@ export async function initBarcodeScanner(elementId, onScan) {
     const html5QrCode = new Html5Qrcode(elementId);
 
     const config = {
-        fps: 20, // Slightly lower FPS can sometimes help detection stability on mobile
+        fps: 30, // Faster scanning for 1D barcodes
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
             const size = Math.floor(minEdgeSize * 0.7);
             return { width: size, height: size };
         },
-        // Request specific resolution to help with barcode clarity
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.QR_CODE
+        ],
         videoConstraints: {
             facingMode: "environment",
             width: { min: 640, ideal: 1280, max: 1920 },
@@ -49,8 +55,9 @@ export async function initBarcodeScanner(elementId, onScan) {
 
 /**
  * Compresses an image file before OCR processing
+ * Optimized for speed: 800px is sweet spot for OCR text clarity
  */
-export async function compressImage(file, maxWidth = 1200) {
+export async function compressImage(file, maxWidth = 800) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -72,7 +79,7 @@ export async function compressImage(file, maxWidth = 1200) {
 
                 canvas.toBlob((blob) => {
                     resolve(blob);
-                }, 'image/jpeg', 0.8); // 80% quality is plenty for OCR
+                }, 'image/jpeg', 0.8);
             };
             img.src = e.target.result;
         };
