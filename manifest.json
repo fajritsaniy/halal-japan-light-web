@@ -1,0 +1,16 @@
+{
+  "name": "Halal Scan JP",
+  "short_name": "HalalScan",
+  "description": "Halal product scanner for Japan",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2ecc71",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3233/3233483.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
