@@ -2,111 +2,117 @@ import { h, render } from 'https://esm.sh/preact';
 import { useState, useEffect, useRef } from 'https://esm.sh/preact/hooks';
 import htm from 'https://esm.sh/htm';
 import { detectHalalStatus } from './halal-data.js';
-import { initBarcodeScanner, lookupBarcode } from './scan-logic.js';
+import { initBarcodeScanner, lookupBarcode, compressImage } from './scan-logic.js';
 
 const html = htm.bind(h);
 
 function App() {
-    const [view, setView] = useState('home'); // home, scanning, results
-    const [scanMode, setScanMode] = useState(null); // barcode, ingredients
-    const [scannedResult, setScannedResult] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null);
+  const [view, setView] = useState('home'); // home, scanning, results
+  const [scanMode, setScanMode] = useState(null); // barcode, ingredients
+  const [scannedResult, setScannedResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-    const scannerRef = useRef(null);
+  const scannerRef = useRef(null);
 
-    const startScanning = (mode) => {
-        setView('scanning');
-        setScanMode(mode);
-        setErrorMessage(null);
-    };
+  const startScanning = (mode) => {
+    setView('scanning');
+    setScanMode(mode);
+    setErrorMessage(null);
+  };
 
-    const goHome = async () => {
-        if (scannerRef.current) {
-            try {
-                // Ensure we don't hang if stop() takes too long on iOS
-                await Promise.race([
-                    scannerRef.current.stop(),
-                    new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2000))
-                ]).catch(console.warn);
-            } catch (err) {
-                console.warn("Scanner stop failed", err);
-            }
-            scannerRef.current = null;
-        }
+  const goHome = async () => {
+    if (scannerRef.current) {
+      try {
+        // Ensure we don't hang if stop() takes too long on iOS
+        await Promise.race([
+          scannerRef.current.stop(),
+          new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2000))
+        ]).catch(console.warn);
+      } catch (err) {
+        console.warn("Scanner stop failed", err);
+      }
+      scannerRef.current = null;
+    }
 
-        setView('home');
-        setScannedResult(null);
-        setScanMode(null);
-        setLoading(false);
-    };
+    setView('home');
+    setScannedResult(null);
+    setScanMode(null);
+    setLoading(false);
+  };
 
-    useEffect(() => {
-        if (view === 'scanning' && scanMode === 'barcode') {
-            initBarcodeScanner('reader', async (barcode) => {
-                setLoading(true);
-                const product = await lookupBarcode(barcode);
-                if (product) {
-                    const status = detectHalalStatus(product.ingredients);
-                    setScannedResult({
-                        ...status,
-                        productName: product.productName,
-                        image: product.image
-                    });
-                    setView('results');
-                } else {
-                    setErrorMessage("Product not found in database. Please try scanning the ingredient list directly.");
-                    setView('home');
-                }
-                setLoading(false);
-            }).then(scanner => {
-                scannerRef.current = scanner;
-            }).catch(err => {
-                setErrorMessage("Could not access camera. Please check permissions.");
-                setView('home');
-            });
-        }
-    }, [view, scanMode]);
-
-    const handleManualOCR = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
+  useEffect(() => {
+    if (view === 'scanning' && scanMode === 'barcode') {
+      initBarcodeScanner('reader', async (barcode) => {
         setLoading(true);
-        setView('results');
-        setScannedResult({ productName: 'Analyzing Japanese ingredients...', status: 'PENDING', matches: [] });
-
-        try {
-            // Load Tesseract via CDN if not present
-            if (typeof Tesseract === 'undefined') {
-                await new Promise((resolve, reject) => {
-                    const s = document.createElement('script');
-                    s.src = 'https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js';
-                    s.onload = resolve;
-                    s.onerror = reject;
-                    document.head.appendChild(s);
-                });
-            }
-
-            // Initialize worker for Japanese + English
-            const worker = await Tesseract.createWorker('jpn+eng');
-            const { data: { text } } = await worker.recognize(file);
-            await worker.terminate();
-
-            const status = detectHalalStatus(text);
-            setScannedResult({
-                ...status,
-                productName: 'Ingredient Analysis Result'
-            });
-        } catch (err) {
-            console.error(err);
-            setErrorMessage("Photo analysis failed. Ensure the text is clear.");
-            setView('home');
+        const product = await lookupBarcode(barcode);
+        if (product) {
+          const status = detectHalalStatus(product.ingredients);
+          setScannedResult({
+            ...status,
+            productName: product.productName,
+            image: product.image
+          });
+          setView('results');
+        } else {
+          setErrorMessage("Product not found in database. Please try scanning the ingredient list directly.");
+          setView('home');
         }
         setLoading(false);
-    };
+      }).then(scanner => {
+        scannerRef.current = scanner;
+      }).catch(err => {
+        setErrorMessage("Could not access camera. Please check permissions.");
+        setView('home');
+      });
+    }
+  }, [view, scanMode]);
 
-    return html`
+  const handleManualOCR = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    setView('results');
+    setScannedResult({ productName: 'Analyzing Japanese ingredients...', status: 'PENDING', matches: [] });
+
+    try {
+      // Compress image first for faster processing
+      setScannedResult({ productName: 'Compressing image for speed...', status: 'PENDING', matches: [] });
+      const compressedBlob = await compressImage(file);
+
+      // Load Tesseract via CDN if not present
+      if (typeof Tesseract === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      setScannedResult({ productName: 'Analyzing ingredients...', status: 'PENDING', matches: [] });
+
+      // Initialize worker for Japanese + English
+      const worker = await Tesseract.createWorker('jpn+eng');
+      const { data: { text } } = await worker.recognize(compressedBlob);
+      await worker.terminate();
+
+      const status = detectHalalStatus(text);
+      setScannedResult({
+        ...status,
+        productName: 'Ingredient Analysis Result'
+      });
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Photo analysis failed. Ensure the text is clear.");
+      setView('home');
+    }
+    setLoading(false);
+  };
+
+  return html`
     <div class="fade-in">
       <header class="header">
         <h1>Halal Scan JP</h1>

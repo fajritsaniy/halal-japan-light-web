@@ -13,25 +13,18 @@ export async function initBarcodeScanner(elementId, onScan) {
 
     const html5QrCode = new Html5Qrcode(elementId);
 
-    // Dynamic qrbox function for perfect mobile centering
-    const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
-        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-        let qrboxSize = Math.floor(minEdgeSize * 0.7);
-        return {
-            width: qrboxSize,
-            height: qrboxSize
-        };
-    }
-
     const config = {
-        fps: 25,
+        fps: 20, // Slightly lower FPS can sometimes help detection stability on mobile
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-            const size = Math.floor(minEdgeSize * 0.6);
+            const size = Math.floor(minEdgeSize * 0.7);
             return { width: size, height: size };
         },
-        experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true
+        // Request specific resolution to help with barcode clarity
+        videoConstraints: {
+            facingMode: "environment",
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 480, ideal: 720, max: 1080 }
         }
     };
 
@@ -52,6 +45,39 @@ export async function initBarcodeScanner(elementId, onScan) {
         console.error("Camera access failed", err);
         throw err;
     }
+}
+
+/**
+ * Compresses an image file before OCR processing
+ */
+export async function compressImage(file, maxWidth = 1200) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = (maxWidth / width) * height;
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 0.8); // 80% quality is plenty for OCR
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
 export async function lookupBarcode(barcode) {
