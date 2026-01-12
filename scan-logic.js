@@ -7,25 +7,29 @@ const HTML5_QRCODE_URL = 'https://unpkg.com/html5-qrcode';
 const TESSERACT_URL = 'https://unpkg.com/tesseract.js@v5.0.0/dist/tesseract.min.js';
 
 export async function initBarcodeScanner(elementId, onScan) {
-    // We'll dynamically load the script if not present
-    if (typeof Html5QrcodeScanner === 'undefined') {
+    if (typeof Html5Qrcode === 'undefined') {
         await loadScript(HTML5_QRCODE_URL);
     }
 
     const html5QrCode = new Html5Qrcode(elementId);
-    const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+    // Use a square qrbox for better mobile visual alignment
+    const config = {
+        fps: 20,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+    };
 
     try {
         await html5QrCode.start(
             { facingMode: "environment" },
             config,
-            (decodedText) => {
-                html5QrCode.stop();
+            async (decodedText) => {
+                // stop() returns a promise, but we can call it and proceed
+                html5QrCode.stop().catch(console.error);
                 onScan(decodedText);
             },
-            (errorMessage) => {
-                // Just noise, ignore
-            }
+            () => { } // Ignore errors
         );
         return html5QrCode;
     } catch (err) {

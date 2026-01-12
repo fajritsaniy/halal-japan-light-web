@@ -1,135 +1,146 @@
 :root {
-  --primary: #2ecc71;
-  --secondary: #27ae60;
-  --danger: #e74c3c;
-  --warning: #f1c40f;
-  --info: #3498db;
-  --dark: #1a1a1a;
-  --light: #f8f9fa;
-  --white: #ffffff;
-  --glass: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --radius: 16px;
+    --primary: #2ecc71;
+    --secondary: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f1c40f;
+    --info: #3498db;
+    --dark: #1a1a1a;
+    --light: #f8f9fa;
+    --white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    --radius: 16px;
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
-  background: #f0f2f5;
-  color: var(--dark);
-  line-height: 1.6;
-  overflow-x: hidden;
+    font-family: 'Outfit', sans-serif;
+    background: #f0f2f5;
+    color: var(--dark);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
 #app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+    animation: fadeIn 0.4s ease-out forwards;
 }
 
 /* UI Components */
 .container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
 }
 
 .card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-  border: 1px solid rgba(0,0,0,0.05);
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 24px;
-  border-radius: var(--radius);
-  border: none;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
 }
 
 .btn-primary {
-  background: var(--primary);
-  color: var(--white);
+    background: var(--primary);
+    color: var(--white);
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
-  background: var(--secondary);
+    transform: scale(0.98);
+    background: var(--secondary);
 }
 
 .header {
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: var(--white);
-  text-align: center;
-  border-radius: 0 0 32px 32px;
-  margin-bottom: -30px;
-  position: relative;
-  z-index: 10;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: var(--white);
+    text-align: center;
+    border-radius: 0 0 32px 32px;
+    margin-bottom: -30px;
+    position: relative;
+    z-index: 10;
 }
 
 .header h1 {
-  font-size: 28px;
-  margin-bottom: 8px;
+    font-size: 28px;
+    margin-bottom: 8px;
 }
 
 .header p {
-  opacity: 0.9;
-  font-weight: 300;
-  font-size: 14px;
+    opacity: 0.9;
+    font-weight: 300;
+    font-size: 14px;
 }
 
 /* Scanner View */
 .scanner-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1/1;
-  background: #000;
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    background: #000;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
 }
 
 #reader {
-  width: 100% !important;
+    width: 100% !important;
 }
 
 #reader__scan_region {
-  background: #000;
+    background: #000;
 }
 
 /* Responsive */
 @media (max-width: 400px) {
-  .header h1 { font-size: 24px; }
-  .container { padding: 15px; }
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .container {
+        padding: 15px;
+    }
 }

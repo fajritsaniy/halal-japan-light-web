@@ -21,9 +21,16 @@ function App() {
         setErrorMessage(null);
     };
 
-    const goHome = () => {
-        if (scannerRef.current && scannerRef.current.stop) {
-            scannerRef.current.stop();
+    const goHome = async () => {
+        if (scannerRef.current) {
+            try {
+                if (scannerRef.current.isScanning) {
+                    await scannerRef.current.stop();
+                }
+            } catch (err) {
+                console.warn("Scanner stop failed", err);
+            }
+            scannerRef.current = null;
         }
         setView('home');
         setScannedResult(null);
