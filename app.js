@@ -133,7 +133,7 @@ function App() {
         `}
 
         ${errorMessage && html`
-          <div class="card" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2;">
+          <div class="card" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; position: relative; padding-right: 40px;">
             <div style="display: flex; gap: 10px; align-items: center;">
               <span>⚠️</span>
               <div>
@@ -141,6 +141,11 @@ function App() {
                 <p style="font-size: 13px;">${errorMessage}</p>
               </div>
             </div>
+            <button 
+              onClick=${() => setErrorMessage(null)}
+              style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; color: #c53030; cursor: pointer; padding: 5px; line-height: 1;">
+              ✕
+            </button>
           </div>
         `}
 
