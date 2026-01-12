@@ -17,8 +17,8 @@ export async function initBarcodeScanner(elementId, onScan) {
         fps: 30, // Higher FPS for responsive scanning
         qrbox: (viewfinderWidth, viewfinderHeight) => {
             // Smaller box forces user to hold phone further away -> better focus
-            const width = Math.floor(viewfinderWidth * 0.65);
-            const height = Math.floor(viewfinderHeight * 0.3);
+            const width = Math.floor(viewfinderWidth * 0.5);
+            const height = Math.floor(viewfinderHeight * 0.2);
             return { width, height };
         },
         formatsToSupport: [
