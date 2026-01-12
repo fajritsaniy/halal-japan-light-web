@@ -201,38 +201,54 @@ function App() {
 
         ${view === 'results' && scannedResult && html`
           <div class="fade-in">
-            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? '#e74c3c' : (scannedResult.status === 'SYUBHAT' ? '#f1c40f' : '#2ecc71')};">
+            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? '#e74c3c' :
+        (scannedResult.status === 'SYUBHAT' ? '#f1c40f' :
+          (scannedResult.status === 'PENDING' ? '#3498db' : '#2ecc71'))};">
+              
               <div style="font-size: 64px; margin-bottom: 10px;">
-                ${scannedResult.status === 'HARAM' ? '❌' : (scannedResult.status === 'SYUBHAT' ? '⚠️' : '✅')}
+                ${scannedResult.status === 'HARAM' ? '❌' :
+        (scannedResult.status === 'SYUBHAT' ? '⚠️' :
+          (scannedResult.status === 'PENDING' ? '⏳' : '✅'))}
               </div>
+              
               <h2 style="font-size: 26px; margin-bottom: 5px;">
-                ${scannedResult.status === 'HARAM' ? 'Haram Detected' : (scannedResult.status === 'SYUBHAT' ? 'Syubhat (Doubtful)' : 'Likely Halal')}
+                ${scannedResult.status === 'HARAM' ? 'Haram Detected' :
+        (scannedResult.status === 'SYUBHAT' ? 'Syubhat (Doubtful)' :
+          (scannedResult.status === 'PENDING' ? 'Processing...' : 'Likely Halal'))}
               </h2>
+              
               <p style="color: #666; margin-bottom: 25px; font-size: 14px;">
                 ${scannedResult.productName || 'Analysis Result'}
               </p>
 
-              ${scannedResult.matches.length > 0 ? html`
-                <div style="text-align: left; background: #fdfefe; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-                  <h3 style="font-size: 14px; margin-bottom: 12px; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
-                  <ul style="list-style: none;">
-                    ${scannedResult.matches.map(m => html`
-                      <li style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                          <div style="font-weight: 600; font-size: 15px; color: ${m.type === 'HARAM' ? '#e74c3c' : '#d4ac0d'};">${m.name}</div>
-                          <div style="font-size: 12px; color: #7f8c8d;">${m.translation}</div>
-                        </div>
-                        <div style="font-size: 10px; padding: 4px 8px; border-radius: 20px; background: ${m.type === 'HARAM' ? '#fdecea' : '#fef9e7'}; color: ${m.type === 'HARAM' ? '#e74c3c' : '#9a7d0a'}; font-weight: 700;">
-                          ${m.type}
-                        </div>
-                      </li>
-                    `)}
-                  </ul>
+              ${scannedResult.status === 'PENDING' ? html`
+                <div style="padding: 20px; text-align: center;">
+                  <div class="spinner" style="margin: 0 auto 15px;"></div>
+                  <p style="font-size: 13px; color: #666;">This usually takes 5-10 seconds...</p>
                 </div>
               ` : html`
-                <div style="background: #e9f7ef; padding: 15px; border-radius: 12px; color: #1e8449; font-size: 14px;">
-                  No restricted ingredients found in the scanned text.
-                </div>
+                ${scannedResult.matches.length > 0 ? html`
+                  <div style="text-align: left; background: #fdfefe; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
+                    <ul style="list-style: none;">
+                      ${scannedResult.matches.map(m => html`
+                        <li style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+                          <div>
+                            <div style="font-weight: 600; font-size: 15px; color: ${m.type === 'HARAM' ? '#e74c3c' : '#d4ac0d'};">${m.name}</div>
+                            <div style="font-size: 12px; color: #7f8c8d;">${m.translation}</div>
+                          </div>
+                          <div style="font-size: 10px; padding: 4px 8px; border-radius: 20px; background: ${m.type === 'HARAM' ? '#fdecea' : '#fef9e7'}; color: ${m.type === 'HARAM' ? '#e74c3c' : '#9a7d0a'}; font-weight: 700;">
+                            ${m.type}
+                          </div>
+                        </li>
+                      `)}
+                    </ul>
+                  </div>
+                ` : html`
+                  <div style="background: #e9f7ef; padding: 15px; border-radius: 12px; color: #1e8449; font-size: 14px;">
+                    No restricted ingredients found in the scanned text.
+                  </div>
+                `}
               `}
             </div>
             
