@@ -25,7 +25,11 @@ export async function initBarcodeScanner(elementId, onScan) {
 
     const config = {
         fps: 25,
-        qrbox: { width: 280, height: 280 },
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+            const size = Math.floor(minEdgeSize * 0.6);
+            return { width: size, height: size };
+        },
         experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
         }
