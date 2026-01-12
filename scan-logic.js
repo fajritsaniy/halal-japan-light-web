@@ -25,8 +25,7 @@ export async function initBarcodeScanner(elementId, onScan) {
 
     const config = {
         fps: 25,
-        qrbox: qrboxFunction,
-        aspectRatio: 1.0,
+        qrbox: { width: 280, height: 280 },
         experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
         }

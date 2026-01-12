@@ -137,6 +137,11 @@ body {
     background: #000;
 }
 
+#reader video {
+    object-fit: cover !important;
+    border-radius: var(--radius);
+}
+
 /* Responsive */
 @media (max-width: 400px) {
     .header h1 {
