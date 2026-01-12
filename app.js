@@ -22,20 +22,18 @@ function App() {
     };
 
     const goHome = async () => {
-        setLoading(true); // Show spinner during cleanup
         if (scannerRef.current) {
             try {
-                if (scannerRef.current.isScanning) {
-                    await scannerRef.current.stop();
-                }
+                // Ensure we don't hang if stop() takes too long on iOS
+                await Promise.race([
+                    scannerRef.current.stop(),
+                    new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2000))
+                ]).catch(console.warn);
             } catch (err) {
                 console.warn("Scanner stop failed", err);
             }
             scannerRef.current = null;
         }
-
-        // Small delay to ensure iOS releases hardware
-        await new Promise(r => setTimeout(r, 300));
 
         setView('home');
         setScannedResult(null);
@@ -191,7 +189,7 @@ function App() {
           </div>
         `}
 
-        ${view === 'results' && scannedResult && !loading && html`
+        ${view === 'results' && scannedResult && html`
           <div class="fade-in">
             <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? '#e74c3c' : (scannedResult.status === 'SYUBHAT' ? '#f1c40f' : '#2ecc71')};">
               <div style="font-size: 64px; margin-bottom: 10px;">
