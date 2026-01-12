@@ -13,11 +13,23 @@ export async function initBarcodeScanner(elementId, onScan) {
 
     const html5QrCode = new Html5Qrcode(elementId);
 
-    // Use a square qrbox for better mobile visual alignment
+    // Dynamic qrbox function for perfect mobile centering
+    const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
+        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+        let qrboxSize = Math.floor(minEdgeSize * 0.7);
+        return {
+            width: qrboxSize,
+            height: qrboxSize
+        };
+    }
+
     const config = {
-        fps: 20,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
+        fps: 25,
+        qrbox: qrboxFunction,
+        aspectRatio: 1.0,
+        experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+        }
     };
 
     try {
@@ -25,11 +37,12 @@ export async function initBarcodeScanner(elementId, onScan) {
             { facingMode: "environment" },
             config,
             async (decodedText) => {
-                // stop() returns a promise, but we can call it and proceed
-                html5QrCode.stop().catch(console.error);
+                try {
+                    await html5QrCode.stop();
+                } catch (e) { console.warn(e); }
                 onScan(decodedText);
             },
-            () => { } // Ignore errors
+            () => { }
         );
         return html5QrCode;
     } catch (err) {

@@ -22,6 +22,7 @@ function App() {
     };
 
     const goHome = async () => {
+        setLoading(true); // Show spinner during cleanup
         if (scannerRef.current) {
             try {
                 if (scannerRef.current.isScanning) {
@@ -32,6 +33,10 @@ function App() {
             }
             scannerRef.current = null;
         }
+
+        // Small delay to ensure iOS releases hardware
+        await new Promise(r => setTimeout(r, 300));
+
         setView('home');
         setScannedResult(null);
         setScanMode(null);
