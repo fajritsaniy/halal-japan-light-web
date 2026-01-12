@@ -137,6 +137,8 @@ body {
 #reader video {
     object-fit: cover !important;
     border-radius: var(--radius);
+    min-height: 400px;
+    /* Ensure enough height for the rectangular guide */
 }
 
 /* Responsive */

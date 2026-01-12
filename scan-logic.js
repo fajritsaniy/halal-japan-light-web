@@ -14,11 +14,12 @@ export async function initBarcodeScanner(elementId, onScan) {
     const html5QrCode = new Html5Qrcode(elementId);
 
     const config = {
-        fps: 30, // Faster scanning for 1D barcodes
+        fps: 30, // Higher FPS for responsive scanning
         qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-            const size = Math.floor(minEdgeSize * 0.7);
-            return { width: size, height: size };
+            // Rectangular box is better for 1D barcodes (EAN/UPC)
+            const width = Math.floor(viewfinderWidth * 0.8);
+            const height = Math.floor(viewfinderHeight * 0.4);
+            return { width, height };
         },
         formatsToSupport: [
             Html5QrcodeSupportedFormats.EAN_13,
@@ -27,6 +28,9 @@ export async function initBarcodeScanner(elementId, onScan) {
             Html5QrcodeSupportedFormats.UPC_E,
             Html5QrcodeSupportedFormats.QR_CODE
         ],
+        experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+        },
         videoConstraints: {
             facingMode: "environment",
             width: { min: 640, ideal: 1280, max: 1920 },
