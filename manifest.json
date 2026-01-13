@@ -4,8 +4,8 @@
   "description": "Halal product scanner for Japan",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0e1e25",
-  "theme_color": "#0e1e25",
+  "background_color": "#ffffff",
+  "theme_color": "#2ecc71",
   "icons": [
     {
       "src": "logo.png",

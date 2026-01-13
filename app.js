@@ -125,17 +125,17 @@ function App() {
 
       <main class="container">
         ${loading && html`
-          <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary);">
+          <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary); background: var(--white);">
             <div style="font-size: 32px; margin-bottom: 10px; animation: bounce 1s infinite;">🔍</div>
-            <p style="font-weight: 600;">Analyzing ingredients...</p>
-            <p style="font-size: 12px; color: #666;">Comparing against JHF standards</p>
+            <p style="font-weight: 600; color: var(--dark);">Analyzing ingredients...</p>
+            <p style="font-size: 12px; color: #8e8e93;">Comparing against JHF standards</p>
           </div>
         `}
 
         ${errorMessage && html`
-          <div class="card fade-in" style="background: rgba(231, 76, 60, 0.1); color: #ff7675; border: 1px solid rgba(231, 76, 60, 0.3); margin-top: 10px; position: relative;">
+          <div class="card fade-in" style="background: rgba(255, 69, 58, 0.1); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3); margin-top: 10px; position: relative;">
             <button onClick=${() => setErrorMessage(null)} 
-                    style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #c53030; opacity: 0.5;">×</button>
+                    style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #ff453a; opacity: 0.5;">×</button>
             <div style="display: flex; gap: 10px; align-items: center; padding-right: 20px;">
               <span style="font-size: 20px;">⚠️</span>
               <div>
@@ -148,8 +148,8 @@ function App() {
 
         ${view === 'home' && !loading && html`
           <div class="fade-in">
-            <div class="card">
-              <h2 style="margin-bottom: 20px; font-size: 20px;">Scan Options</h2>
+            <div class="card" style="background: var(--white);">
+              <h2 style="margin-bottom: 20px; font-size: 20px; color: var(--dark);">Scan Options</h2>
               
               <button class="btn btn-primary" onClick=${() => startScanning('barcode')} style="margin-bottom: 12px;">
                 <span style="font-size: 20px;">📸</span> 
@@ -160,7 +160,7 @@ function App() {
               </button>
               
               <div style="position: relative;">
-                <button class="btn btn-primary" style="background: var(--light); border: 1px solid var(--glass-border);">
+                <button class="btn btn-primary" style="background: var(--info);">
                   <span style="font-size: 20px;">📝</span>
                   <div style="text-align: left;">
                     <div style="font-size: 16px;">Scan Ingredients</div>
@@ -173,12 +173,12 @@ function App() {
               </div>
             </div>
             
-            <div class="card" style="background: rgba(0, 173, 159, 0.05); border-color: rgba(0, 173, 159, 0.2);">
+            <div class="card" style="background: rgba(48, 209, 88, 0.1); border-color: rgba(48, 209, 88, 0.2);">
               <div style="display: flex; gap: 15px;">
                 <div style="font-size: 24px;">🕌</div>
                 <div>
-                  <h3 style="font-size: 15px; color: #1e8449; margin-bottom: 4px;">Resident Focused</h3>
-                  <p style="font-size: 13px; color: #444;">
+                  <h3 style="font-size: 15px; color: var(--primary); margin-bottom: 4px;">Resident Focused</h3>
+                  <p style="font-size: 13px; color: #aeaeb2;">
                     We analyze common doubtful ingredients like "Shortening" and "Emulsifiers" specifically for the Japanese market.
                   </p>
                 </div>
@@ -195,7 +195,7 @@ function App() {
                 Starting camera...
               </div>
             </div>
-            <button class="btn" onClick=${goHome} style="background: rgba(255,255,255,0.05); color: var(--text-muted); margin-top: 10px;">
+            <button class="btn" onClick=${goHome} style="background: var(--white); color: var(--dark); border: 1px solid var(--glass-border);">
               Take me back
             </button>
           </div>
@@ -203,9 +203,9 @@ function App() {
 
         ${view === 'results' && scannedResult && html`
           <div class="fade-in">
-            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? '#e74c3c' :
-        (scannedResult.status === 'SYUBHAT' ? '#f1c40f' :
-          (scannedResult.status === 'PENDING' ? '#3498db' : '#2ecc71'))};">
+            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? 'var(--danger)' :
+        (scannedResult.status === 'SYUBHAT' ? 'var(--warning)' :
+          (scannedResult.status === 'PENDING' ? 'var(--info)' : 'var(--primary)'))}; background: var(--white);">
               
               <div style="font-size: 64px; margin-bottom: 10px;">
                 ${scannedResult.status === 'HARAM' ? '❌' :
@@ -213,33 +213,33 @@ function App() {
           (scannedResult.status === 'PENDING' ? '⏳' : '✅'))}
               </div>
               
-              <h2 style="font-size: 26px; margin-bottom: 5px;">
+              <h2 style="font-size: 26px; margin-bottom: 5px; color: var(--dark);">
                 ${scannedResult.status === 'HARAM' ? 'Haram Detected' :
         (scannedResult.status === 'SYUBHAT' ? 'Syubhat (Doubtful)' :
           (scannedResult.status === 'PENDING' ? 'Processing...' : 'Likely Halal'))}
               </h2>
               
-              <p style="color: #666; margin-bottom: 25px; font-size: 14px;">
+              <p style="color: #aeaeb2; margin-bottom: 25px; font-size: 14px;">
                 ${scannedResult.productName || 'Analysis Result'}
               </p>
 
               ${scannedResult.status === 'PENDING' ? html`
                 <div style="padding: 20px; text-align: center;">
                   <div class="spinner" style="margin: 0 auto 15px;"></div>
-                  <p style="font-size: 13px; color: #666;">This usually takes 5-10 seconds...</p>
+                  <p style="font-size: 13px; color: #aeaeb2;">This usually takes 5-10 seconds...</p>
                 </div>
               ` : html`
                 ${scannedResult.matches.length > 0 ? html`
-                  <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
+                  <div style="text-align: left; background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--dark); text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
                     <ul style="list-style: none;">
                       ${scannedResult.matches.map(m => html`
-                        <li style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+                        <li style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
                           <div>
-                            <div style="font-weight: 600; font-size: 15px; color: ${m.type === 'HARAM' ? '#e74c3c' : '#d4ac0d'};">${m.name}</div>
-                            <div style="font-size: 12px; color: #7f8c8d;">${m.translation}</div>
+                            <div style="font-weight: 600; font-size: 15px; color: ${m.type === 'HARAM' ? 'var(--danger)' : 'var(--warning)'};">${m.name}</div>
+                            <div style="font-size: 12px; color: #8e8e93;">${m.translation}</div>
                           </div>
-                          <div style="font-size: 10px; padding: 4px 8px; border-radius: 20px; background: ${m.type === 'HARAM' ? '#fdecea' : '#fef9e7'}; color: ${m.type === 'HARAM' ? '#e74c3c' : '#9a7d0a'}; font-weight: 700;">
+                          <div style="font-size: 10px; padding: 4px 8px; border-radius: 20px; background: ${m.type === 'HARAM' ? 'rgba(255, 69, 58, 0.1)' : 'rgba(255, 214, 10, 0.1)'}; color: ${m.type === 'HARAM' ? 'var(--danger)' : 'var(--warning)'}; font-weight: 700;">
                             ${m.type}
                           </div>
                         </li>
@@ -247,7 +247,7 @@ function App() {
                     </ul>
                   </div>
                 ` : html`
-                  <div style="background: rgba(0, 173, 159, 0.1); padding: 15px; border-radius: 12px; color: var(--primary); font-size: 14px;">
+                  <div style="background: rgba(48, 209, 88, 0.1); padding: 15px; border-radius: 12px; color: var(--primary); font-size: 14px; border: 1px solid rgba(48, 209, 88, 0.2);">
                     No restricted ingredients found in the scanned text.
                   </div>
                 `}
