@@ -12,8 +12,29 @@ function App() {
   const [scannedResult, setScannedResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system');
 
   const scannerRef = useRef(null);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'system') {
+      root.removeAttribute('data-theme');
+    } else {
+      root.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : (prev === 'dark' ? 'system' : 'light'));
+  };
+
+  const getThemeIcon = () => {
+    if (theme === 'light') return '☀️';
+    if (theme === 'dark') return '🌙';
+    return '🌓';
+  };
 
   const startScanning = (mode) => {
     setView('scanning');
@@ -24,7 +45,6 @@ function App() {
   const goHome = async () => {
     if (scannerRef.current) {
       try {
-        // Ensure we don't hang if stop() takes too long on iOS
         await Promise.race([
           scannerRef.current.stop(),
           new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2000))
@@ -72,7 +92,6 @@ function App() {
 
   const initWorker = async () => {
     if (workerRef.current) return workerRef.current;
-
     if (typeof Tesseract === 'undefined') {
       await new Promise((resolve, reject) => {
         const s = document.createElement('script');
@@ -82,7 +101,6 @@ function App() {
         document.head.appendChild(s);
       });
     }
-
     const worker = await Tesseract.createWorker('jpn+eng');
     workerRef.current = worker;
     return worker;
@@ -94,15 +112,13 @@ function App() {
 
     setLoading(true);
     setView('results');
-    setScannedResult({ productName: 'Waking up analysis engine...', status: 'PENDING', matches: [] });
+    setScannedResult({ productName: 'Analyzing label...', status: 'PENDING', matches: [] });
 
     try {
       const compressedBlob = await compressImage(file);
       const worker = await initWorker();
-
       setScannedResult({ productName: 'Reading Japanese text...', status: 'PENDING', matches: [] });
       const { data: { text } } = await worker.recognize(compressedBlob);
-
       const status = detectHalalStatus(text);
       setScannedResult({
         ...status,
@@ -110,7 +126,7 @@ function App() {
       });
     } catch (err) {
       console.error(err);
-      setErrorMessage("Analysis failed. Try taking a closer, clearer photo.");
+      setErrorMessage("Analysis failed. Ensure the text is clear.");
       setView('home');
     }
     setLoading(false);
@@ -119,31 +135,39 @@ function App() {
   return html`
     <div class="fade-in">
       <header class="header">
+        <button class="theme-toggle" onClick=${toggleTheme} title="Switch Theme">
+          ${getThemeIcon()}
+        </button>
+        <div class="logo-container">
+          <img src="logo.jpg" alt="Halal Scan Japan" />
+        </div>
         <h1>Halal Scan JP</h1>
         <p>Expert safety for Muslim residents</p>
       </header>
 
       <main class="container">
         ${loading && html`
-          <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary);">
-            <div style="font-size: 32px; margin-bottom: 10px; animation: bounce 1s infinite;">🔍</div>
+          <div class="card" style="text-align: center; border-bottom: 4px solid var(--info);">
+            <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+              <div class="spinner"></div>
+            </div>
             <p style="font-weight: 600;">Analyzing ingredients...</p>
-            <p style="font-size: 12px; color: #666;">Comparing against JHF standards</p>
+            <p style="font-size: 13px; color: var(--text-secondary);">Comparing against JHF standards</p>
           </div>
         `}
 
         ${errorMessage && html`
-          <div class="card" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; position: relative; padding-right: 40px;">
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span>⚠️</span>
+          <div class="card" style="background: rgba(255, 59, 48, 0.1); color: var(--danger); border-color: var(--danger); position: relative; padding-right: 44px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="font-size: 20px;">⚠️</span>
               <div>
                 <p style="font-weight: 600;">Issue detected</p>
-                <p style="font-size: 13px;">${errorMessage}</p>
+                <p style="font-size: 14px; opacity: 0.9;">${errorMessage}</p>
               </div>
             </div>
             <button 
               onClick=${() => setErrorMessage(null)}
-              style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; color: #c53030; cursor: pointer; padding: 5px; line-height: 1;">
+              style="position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 20px; color: var(--danger); cursor: pointer; padding: 4px;">
               ✕
             </button>
           </div>
@@ -152,22 +176,22 @@ function App() {
         ${view === 'home' && !loading && html`
           <div class="fade-in">
             <div class="card">
-              <h2 style="margin-bottom: 20px; font-size: 20px;">Scan Options</h2>
+              <h2 style="margin-bottom: 20px; font-size: 18px; font-weight: 600;">Scan Options</h2>
               
               <button class="btn btn-primary" onClick=${() => startScanning('barcode')} style="margin-bottom: 12px;">
-                <span style="font-size: 20px;">📸</span> 
+                <span style="font-size: 24px;">📸</span> 
                 <div style="text-align: left;">
                   <div style="font-size: 16px;">Scan Barcode</div>
-                  <div style="font-size: 11px; font-weight: 400; opacity: 0.9;">Fast lookup via JAN code</div>
+                  <div style="font-size: 12px; font-weight: 400; opacity: 0.85;">Detect product via JAN code</div>
                 </div>
               </button>
               
               <div style="position: relative;">
-                <button class="btn btn-primary" style="background: #3498db;">
-                  <span style="font-size: 20px;">📝</span>
+                <button class="btn btn-secondary">
+                  <span style="font-size: 24px;">📝</span>
                   <div style="text-align: left;">
                     <div style="font-size: 16px;">Scan Ingredients</div>
-                    <div style="font-size: 11px; font-weight: 400; opacity: 0.9;">Direct Japanese label OCR</div>
+                    <div style="font-size: 12px; font-weight: 400; opacity: 0.85;">OCR for direct label analysis</div>
                   </div>
                 </button>
                 <input type="file" accept="image/*" capture="environment" 
@@ -176,13 +200,13 @@ function App() {
               </div>
             </div>
             
-            <div class="card" style="background: #e9f7ef; border-color: #d4efdf;">
-              <div style="display: flex; gap: 15px;">
-                <div style="font-size: 24px;">🕌</div>
+            <div class="card" style="background: rgba(52, 199, 89, 0.1); border-color: var(--primary);">
+              <div style="display: flex; gap: 16px;">
+                <div style="font-size: 28px;">🕌</div>
                 <div>
-                  <h3 style="font-size: 15px; color: #1e8449; margin-bottom: 4px;">Resident Focused</h3>
-                  <p style="font-size: 13px; color: #444;">
-                    We analyze common doubtful ingredients like "Shortening" and "Emulsifiers" specifically for the Japanese market.
+                  <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 4px; font-weight: 600;">Japan Resident Focused</h3>
+                  <p style="font-size: 14px; color: var(--text-secondary);">
+                    Specialized detection for emulsifiers, shortening, and alcohol types common in Japanese markets.
                   </p>
                 </div>
               </div>
@@ -193,80 +217,79 @@ function App() {
         ${view === 'scanning' && html`
           <div class="fade-in">
             <div class="scanner-container" id="reader">
-              <div style="color: white; padding: 60px 40px; text-align: center;">
-                <div class="spinner" style="margin: 0 auto 20px;"></div>
-                Starting camera...
+              <div style="color: white; padding: 40px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div class="spinner" style="margin-bottom: 20px;"></div>
+                <p>Initializing Camera...</p>
               </div>
             </div>
-            <button class="btn" onClick=${goHome} style="background: #eee; color: #333;">
-              Take me back
+            <button class="btn" onClick=${goHome} style="background: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border);">
+              Cancel
             </button>
           </div>
         `}
 
         ${view === 'results' && scannedResult && html`
           <div class="fade-in">
-            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? '#e74c3c' :
-        (scannedResult.status === 'SYUBHAT' ? '#f1c40f' :
-          (scannedResult.status === 'PENDING' ? '#3498db' : '#2ecc71'))};">
-              
-              <div style="font-size: 64px; margin-bottom: 10px;">
+            <div class="card" style="text-align: center;">
+              <div style="font-size: 72px; margin-bottom: 16px;">
                 ${scannedResult.status === 'HARAM' ? '❌' :
         (scannedResult.status === 'SYUBHAT' ? '⚠️' :
           (scannedResult.status === 'PENDING' ? '⏳' : '✅'))}
               </div>
               
-              <h2 style="font-size: 26px; margin-bottom: 5px;">
+              <h2 style="font-size: 26px; font-weight: 700; margin-bottom: 8px;">
                 ${scannedResult.status === 'HARAM' ? 'Haram Detected' :
         (scannedResult.status === 'SYUBHAT' ? 'Syubhat (Doubtful)' :
           (scannedResult.status === 'PENDING' ? 'Processing...' : 'Likely Halal'))}
               </h2>
               
-              <p style="color: #666; margin-bottom: 25px; font-size: 14px;">
+              <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
                 ${scannedResult.productName || 'Analysis Result'}
               </p>
 
               ${scannedResult.status === 'PENDING' ? html`
-                <div style="padding: 20px; text-align: center;">
-                  <div class="spinner" style="margin: 0 auto 15px;"></div>
-                  <p style="font-size: 13px; color: #666;">This usually takes 5-10 seconds...</p>
+                <div style="padding: 24px;">
+                  <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+                    <div class="spinner" style="width: 32px; height: 32px;"></div>
+                  </div>
+                  <p style="font-size: 14px; color: var(--text-secondary);">Analyzing ingredients text...</p>
                 </div>
               ` : html`
                 ${scannedResult.matches.length > 0 ? html`
-                  <div style="text-align: left; background: #fdfefe; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
+                  <div style="text-align: left; background: var(--bg-color); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border);">
+                    <h3 style="font-size: 13px; margin-bottom: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Restricted Ingredients:</h3>
                     <ul style="list-style: none;">
                       ${scannedResult.matches.map(m => html`
-                        <li style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+                        <li style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                           <div>
-                            <div style="font-weight: 600; font-size: 15px; color: ${m.type === 'HARAM' ? '#e74c3c' : '#d4ac0d'};">${m.name}</div>
-                            <div style="font-size: 12px; color: #7f8c8d;">${m.translation}</div>
+                            <div style="font-weight: 600; font-size: 16px; color: ${m.type === 'HARAM' ? 'var(--danger)' : 'var(--warning)'};">${m.name}</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">${m.translation}</div>
                           </div>
-                          <div style="font-size: 10px; padding: 4px 8px; border-radius: 20px; background: ${m.type === 'HARAM' ? '#fdecea' : '#fef9e7'}; color: ${m.type === 'HARAM' ? '#e74c3c' : '#9a7d0a'}; font-weight: 700;">
+                          <span class="status-badge" style="background: ${m.type === 'HARAM' ? 'rgba(255, 59, 48, 0.1)' : 'rgba(255, 204, 0, 0.1)'}; color: ${m.type === 'HARAM' ? 'var(--danger)' : '#9a7d0a'};">
                             ${m.type}
-                          </div>
+                          </span>
                         </li>
                       `)}
                     </ul>
                   </div>
                 ` : html`
-                  <div style="background: #e9f7ef; padding: 15px; border-radius: 12px; color: #1e8449; font-size: 14px;">
-                    No restricted ingredients found in the scanned text.
+                  <div style="background: rgba(52, 199, 89, 0.1); padding: 20px; border-radius: var(--radius); color: var(--primary); font-size: 15px; font-weight: 500; border: 1px solid var(--primary);">
+                    No restricted ingredients found.
                   </div>
                 `}
               `}
             </div>
             
-            <button class="btn btn-primary" onClick=${goHome}>
-              Scan Another Product
+            <button class="btn btn-primary" onClick=${goHome} style="margin-top: 8px;">
+              Done
             </button>
           </div>
         `}
       </main>
 
-      <footer style="padding: 30px 20px; text-align: center; opacity: 0.5; font-size: 11px;">
-        <p>© 2026 Halal Scan JP - Building for the Community</p>
-        <p style="margin-top: 5px;">Data provided by Open Food Facts & JHF Guidelines</p>
+      <footer>
+        <p>© 2026 Halal Scan Japan</p>
+        <p style="margin-top: 4px; opacity: 0.8;">In accordance with JHF Standards</p>
       </footer>
     </div>
   `;

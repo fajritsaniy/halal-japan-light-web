@@ -1,16 +1,41 @@
 :root {
-    --primary: #2ecc71;
-    --secondary: #27ae60;
-    --danger: #e74c3c;
-    --warning: #f1c40f;
-    --info: #3498db;
-    --dark: #1a1a1a;
-    --light: #f8f9fa;
-    --white: #ffffff;
-    --glass: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    --radius: 16px;
+    /* Light Theme (Apple Style) */
+    --bg-color: #F2F2F7;
+    --card-bg: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #3C3C43;
+    --primary: #34C759; /* Apple Green */
+    --primary-alt: #28A745;
+    --danger: #FF3B30; /* Apple Red */
+    --warning: #FFCC00; /* Apple Yellow */
+    --info: #007AFF; /* Apple Blue */
+    --border: rgba(0, 0, 0, 0.1);
+    --glass: rgba(255, 255, 255, 0.7);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --radius: 12px;
+    --radius-lg: 20px;
+}
+
+[data-theme="dark"] {
+    --bg-color: #000000;
+    --card-bg: #1C1C1E;
+    --text-primary: #FFFFFF;
+    --text-secondary: #EBEBF5;
+    --border: rgba(255, 255, 255, 0.15);
+    --glass: rgba(28, 28, 30, 0.8);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-color: #000000;
+        --card-bg: #1C1C1E;
+        --text-primary: #FFFFFF;
+        --text-secondary: #EBEBF5;
+        --border: rgba(255, 255, 255, 0.15);
+        --glass: rgba(28, 28, 30, 0.8);
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
 }
 
 * {
@@ -18,14 +43,16 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
-    font-family: 'Outfit', sans-serif;
-    background: #f0f2f5;
-    color: var(--dark);
-    line-height: 1.6;
-    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
 }
 
 #app {
@@ -34,96 +61,130 @@ body {
     flex-direction: column;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .fade-in {
-    animation: fadeIn 0.4s ease-out forwards;
+    animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* UI Components */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .container {
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 16px;
     width: 100%;
 }
 
+.header {
+    padding: 40px 20px 60px;
+    text-align: center;
+    position: relative;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.logo-container {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 16px;
+    border-radius: 22px; /* iOS App Icon Radius */
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    margin-bottom: 4px;
+}
+
+.header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
 .card {
-    background: var(--white);
-    border-radius: var(--radius);
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
     padding: 20px;
     box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+}
+
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
 }
 
 .btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 24px;
+    gap: 12px;
+    padding: 16px;
     border-radius: var(--radius);
     border: none;
-    font-family: inherit;
+    font-size: 17px;
     font-weight: 600;
-    font-size: 16px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
 }
 
 .btn-primary {
-    background: var(--primary);
-    color: var(--white);
+    background-color: var(--primary);
+    color: #FFFFFF;
 }
 
 .btn-primary:active {
-    transform: scale(0.98);
-    background: var(--secondary);
+    background-color: var(--primary-alt);
+    transform: scale(0.97);
 }
 
-.header {
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-    color: var(--white);
-    text-align: center;
-    border-radius: 0 0 32px 32px;
-    margin-bottom: -30px;
-    position: relative;
-    z-index: 10;
+.btn-secondary {
+    background-color: var(--info);
+    color: #FFFFFF;
 }
 
-.header h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
 }
 
-.header p {
-    opacity: 0.9;
-    font-weight: 300;
-    font-size: 14px;
-}
-
-/* Scanner View */
 .scanner-container {
     position: relative;
     width: 100%;
+    aspect-ratio: 3/4;
     background: #000;
-    border-radius: var(--radius);
-    margin-bottom: 20px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 #reader {
@@ -136,18 +197,33 @@ body {
 
 #reader video {
     object-fit: cover !important;
-    border-radius: var(--radius);
-    min-height: 400px;
-    /* Ensure enough height for the rectangular guide */
+    min-height: 100%;
 }
 
-/* Responsive */
-@media (max-width: 400px) {
-    .header h1 {
-        font-size: 24px;
-    }
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
 
-    .container {
-        padding: 15px;
-    }
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0, 122, 255, 0.2);
+    border-top-color: var(--info);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+footer {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
