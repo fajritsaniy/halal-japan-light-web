@@ -133,7 +133,7 @@ function App() {
         `}
 
         ${errorMessage && html`
-          <div class="card fade-in" style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; margin-top: 10px; position: relative;">
+          <div class="card fade-in" style="background: rgba(231, 76, 60, 0.1); color: #ff7675; border: 1px solid rgba(231, 76, 60, 0.3); margin-top: 10px; position: relative;">
             <button onClick=${() => setErrorMessage(null)} 
                     style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; color: #c53030; opacity: 0.5;">×</button>
             <div style="display: flex; gap: 10px; align-items: center; padding-right: 20px;">
@@ -160,7 +160,7 @@ function App() {
               </button>
               
               <div style="position: relative;">
-                <button class="btn btn-primary" style="background: #3498db;">
+                <button class="btn btn-primary" style="background: var(--light); border: 1px solid var(--glass-border);">
                   <span style="font-size: 20px;">📝</span>
                   <div style="text-align: left;">
                     <div style="font-size: 16px;">Scan Ingredients</div>
@@ -173,7 +173,7 @@ function App() {
               </div>
             </div>
             
-            <div class="card" style="background: #e9f7ef; border-color: #d4efdf;">
+            <div class="card" style="background: rgba(0, 173, 159, 0.05); border-color: rgba(0, 173, 159, 0.2);">
               <div style="display: flex; gap: 15px;">
                 <div style="font-size: 24px;">🕌</div>
                 <div>
@@ -195,7 +195,7 @@ function App() {
                 Starting camera...
               </div>
             </div>
-            <button class="btn" onClick=${goHome} style="background: #eee; color: #333;">
+            <button class="btn" onClick=${goHome} style="background: rgba(255,255,255,0.05); color: var(--text-muted); margin-top: 10px;">
               Take me back
             </button>
           </div>
@@ -230,7 +230,7 @@ function App() {
                 </div>
               ` : html`
                 ${scannedResult.matches.length > 0 ? html`
-                  <div style="text-align: left; background: #fdfefe; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+                  <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">Ingredients found:</h3>
                     <ul style="list-style: none;">
                       ${scannedResult.matches.map(m => html`
@@ -247,7 +247,7 @@ function App() {
                     </ul>
                   </div>
                 ` : html`
-                  <div style="background: #e9f7ef; padding: 15px; border-radius: 12px; color: #1e8449; font-size: 14px;">
+                  <div style="background: rgba(0, 173, 159, 0.1); padding: 15px; border-radius: 12px; color: var(--primary); font-size: 14px;">
                     No restricted ingredients found in the scanned text.
                   </div>
                 `}
