@@ -138,11 +138,8 @@ function App() {
         <button class="theme-toggle" onClick=${toggleTheme} title="Switch Theme">
           ${getThemeIcon()}
         </button>
-        <div class="logo-container">
-          <img src="logo.jpg" alt="Halal Scan Japan" />
-        </div>
-        <h1>Halal Scan JP</h1>
-        <p>Expert safety for Muslim residents</p>
+        <h1>Halal Scanner Japan</h1>
+        <p>Expert safety for Japanese Muslims</p>
       </header>
 
       <main class="container">
@@ -152,7 +149,7 @@ function App() {
               <div class="spinner"></div>
             </div>
             <p style="font-weight: 600;">Analyzing ingredients...</p>
-            <p style="font-size: 13px; color: var(--text-secondary);">Comparing against JHF standards</p>
+            <p style="font-size: 13px; color: var(--text-secondary);">Comparing JHF standards</p>
           </div>
         `}
 
@@ -178,7 +175,7 @@ function App() {
             <div class="card">
               <h2 style="margin-bottom: 20px; font-size: 18px; font-weight: 600;">Scan Options</h2>
               
-              <button class="btn btn-primary" onClick=${() => startScanning('barcode')} style="margin-bottom: 12px;">
+              <button class="btn btn-primary" onClick=${() => startScanning('barcode')} style="margin-bottom: 12px; background: var(--primary);">
                 <span style="font-size: 24px;">📸</span> 
                 <div style="text-align: left;">
                   <div style="font-size: 16px;">Scan Barcode</div>
@@ -187,7 +184,7 @@ function App() {
               </button>
               
               <div style="position: relative;">
-                <button class="btn btn-secondary">
+                <button class="btn btn-primary" style="background: var(--info);">
                   <span style="font-size: 24px;">📝</span>
                   <div style="text-align: left;">
                     <div style="font-size: 16px;">Scan Ingredients</div>
@@ -217,20 +214,22 @@ function App() {
         ${view === 'scanning' && html`
           <div class="fade-in">
             <div class="scanner-container" id="reader">
-              <div style="color: white; padding: 40px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <div class="spinner" style="margin-bottom: 20px;"></div>
-                <p>Initializing Camera...</p>
+              <div style="color: white; padding: 60px 40px; text-align: center;">
+                <div class="spinner" style="margin: 0 auto 20px;"></div>
+                Starting camera...
               </div>
             </div>
             <button class="btn" onClick=${goHome} style="background: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border);">
-              Cancel
+              Take me back
             </button>
           </div>
         `}
 
         ${view === 'results' && scannedResult && html`
           <div class="fade-in">
-            <div class="card" style="text-align: center;">
+            <div class="card" style="text-align: center; border-top: 10px solid ${scannedResult.status === 'HARAM' ? 'var(--danger)' :
+        (scannedResult.status === 'SYUBHAT' ? 'var(--warning)' :
+          (scannedResult.status === 'PENDING' ? 'var(--info)' : 'var(--primary)'))};">
               <div style="font-size: 72px; margin-bottom: 16px;">
                 ${scannedResult.status === 'HARAM' ? '❌' :
         (scannedResult.status === 'SYUBHAT' ? '⚠️' :
@@ -262,7 +261,7 @@ function App() {
                       ${scannedResult.matches.map(m => html`
                         <li style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                           <div>
-                            <div style="font-weight: 600; font-size: 16px; color: ${m.type === 'HARAM' ? 'var(--danger)' : 'var(--warning)'};">${m.name}</div>
+                            <div style="font-weight: 600; font-size: 16px; color: ${m.type === 'HARAM' ? 'var(--danger)' : '#d4ac0d'};">${m.name}</div>
                             <div style="font-size: 13px; color: var(--text-secondary);">${m.translation}</div>
                           </div>
                           <span class="status-badge" style="background: ${m.type === 'HARAM' ? 'rgba(255, 59, 48, 0.1)' : 'rgba(255, 204, 0, 0.1)'}; color: ${m.type === 'HARAM' ? 'var(--danger)' : '#9a7d0a'};">
@@ -280,7 +279,7 @@ function App() {
               `}
             </div>
             
-            <button class="btn btn-primary" onClick=${goHome} style="margin-top: 8px;">
+            <button class="btn btn-primary" onClick=${goHome} style="margin-top: 8px; background: var(--primary);">
               Done
             </button>
           </div>
