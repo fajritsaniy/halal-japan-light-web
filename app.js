@@ -119,8 +119,8 @@ function App() {
   return html`
     <div class="fade-in">
       <header class="header">
-        <h1>Halal Scan JP</h1>
-        <p>Expert safety for Muslim residents</p>
+        <h1>Halal Scanner Japan</h1>
+        <p>Expert safety for Japanese Muslim</p>
       </header>
 
       <main class="container">
