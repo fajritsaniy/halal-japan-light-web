@@ -47,7 +47,7 @@ function App() {
         setLoading(true);
         const product = await lookupBarcode(barcode);
         if (product) {
-          const status = detectHalalStatus(product.ingredients);
+          const status = detectHalalStatus(product.ingredients, product.isCertified);
           setScannedResult({
             ...status,
             productName: product.productName,
@@ -208,16 +208,18 @@ function App() {
           (scannedResult.status === 'PENDING' ? 'var(--info)' : 'var(--primary)'))}; background: var(--white);">
               
               <div style="font-size: 64px; margin-bottom: 10px;">
-                ${scannedResult.status === 'HARAM' ? '❌' :
-        (scannedResult.status === 'SYUBHAT' ? '⚠️' :
+                ${scannedResult.level === 'HR2' || scannedResult.level === 'HR1' ? '❌' :
+        (scannedResult.level === 'D' ? '⚠️' :
           (scannedResult.status === 'PENDING' ? '⏳' : '✅'))}
               </div>
               
               <h2 style="font-size: 26px; margin-bottom: 5px; color: var(--dark);">
-                ${scannedResult.status === 'HARAM' ? 'Haram Detected' :
-        (scannedResult.status === 'SYUBHAT' ? 'Syubhat (Doubtful)' :
-          (scannedResult.status === 'PENDING' ? 'Processing...' : 'Likely Halal'))}
+                ${scannedResult.label || 'Processing...'}
               </h2>
+
+              <div class="badge-level level-${scannedResult.level}" style="margin-bottom: 20px;">
+                ${scannedResult.level === '?' ? 'Analyzing' : `LEVEL ${scannedResult.level}`}
+              </div>
               
               <p style="color: #aeaeb2; margin-bottom: 25px; font-size: 14px;">
                 ${scannedResult.productName || 'Analysis Result'}

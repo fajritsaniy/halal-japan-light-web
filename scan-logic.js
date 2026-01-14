@@ -97,10 +97,17 @@ export async function lookupBarcode(barcode) {
         const response = await fetch(url);
         const data = await response.json();
         if (data.status === 1) {
+            const labels = data.product.labels_tags || [];
+            const isHalalCertified = labels.some(tag =>
+                tag.includes('halal') ||
+                tag.includes('certification-officielle')
+            );
+
             return {
                 productName: data.product.product_name || data.product.product_name_en || 'Unknown Product',
                 ingredients: data.product.ingredients_text || data.product.ingredients_text_ja || '',
-                image: data.product.image_url
+                image: data.product.image_url,
+                isCertified: isHalalCertified
             };
         }
         return null;
